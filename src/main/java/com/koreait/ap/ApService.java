@@ -4,24 +4,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.koreait.ap.model.ApartmentInfoEntity;
-import com.koreait.ap.model.LocationCodeEntity;
-import com.koreait.ap.model.SearchDto;
+import com.koreait.ap.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,11 +25,13 @@ public class ApService {
         return mapper.selLocationList();
     }
 
-    public List<ApartmentInfoEntity> selApartmentInfoList() {
-        return mapper.selApartmentInfoList();
-    }
+    public List<ApartmentInfoVo> getData(SearchDto dto) {
 
-    public void getData(SearchDto dto) {
+        List<ApartmentInfoVo> dbList = mapper.selApartmentInfoList(dto);
+        if (dbList.size() > 0) {
+            return dbList;
+        }
+
         String lawdCd = dto.getExcd();
         String dealYm = String.format("%s%02d", dto.getYear(), dto.getMonth());
         System.out.println("dealym : " + dealYm);
@@ -72,8 +67,23 @@ public class ApService {
             e.printStackTrace();
         }
 
-        for(ApartmentInfoEntity item : list2) {
-            System.out.println(item);
-        }
+        if (list2.size() == 0) { return new ArrayList<ApartmentInfoVo>(); }
+
+        LocationCodeEntity codeEntity = mapper.selLocation(dto);
+
+        ApartmentInfoDto apartDto = new ApartmentInfoDto();
+        apartDto.setLocationcode(codeEntity.getCode());
+        apartDto.setApartmentInfoList(list2);
+        mapper.insApartmentInfoForeach(apartDto);
+
+        return mapper.selApartmentInfoList(dto);
+
+//        for(ApartmentInfoEntity item : list2) {
+//            //문자열에 , 없에는 첫번째 방법
+////            String dealAmaount = item.getDealamount();
+////            dealAmaount = dealAmaount.replaceAll(",", "");
+////            item.setDealamount(dealAmaount);
+//            mapper.insApartmentInfo(item);
+//        }
     }
 }

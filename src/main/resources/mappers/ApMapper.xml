@@ -1,13 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.koreait.ap.ApMapper">
+
+    <insert id="insApartmentInfo">
+        INSERT INTO apartment_info
+        (
+            dealamount, buildyear, dealyear, dealmonth, dealday
+        , dong, apartmentname, areaforexclusiveuse, jibun, `floor`
+        , locationcode, excd
+        )
+        SELECT
+            #{dealamount}, #{buildyear}, #{dealyear}, #{dealmonth}, #{dealday}
+             , #{dong}, #{apartmentname}, #{areaforexclusiveuse}, #{jibun}, #{floor}
+             , `code`, #{excd}
+        FROM location_code
+        WHERE excd = #{excd}
+    </insert>
+
+    <insert id="insApartmentInfoForeach">
+        INSERT INTO apartment_info
+        (
+        dealamount, buildyear, dealyear, dealmonth, dealday
+        , dong, apartmentname, areaforexclusiveuse, jibun, `floor`
+        , locationcode, excd
+        )
+        VALUES
+        <foreach collection="apartmentInfoList" item="item" open="(" separator="),(" close=")">
+            #{item.dealamount}, #{item.buildyear}, #{item.dealyear}, #{item.dealmonth}, #{item.dealday}
+            , #{item.dong}, #{item.apartmentname}, #{item.areaforexclusiveuse}, #{item.jibun}, #{item.floor}
+            , #{locationcode}, #{item.excd}
+        </foreach>
+    </insert>
+
     <select id="selLocationList" resultType="LocationCodeEntity">
         SELECT * FROM location_code
     </select>
 
-    <select id="selApartmentInfoList" resultType="ApartmentInfoEntity">
-        SELECT dong, jibun, apartmentname, dealamount, buildyear, dealyear, dealday, areaforexclusiveuse, `floor`
-        FROM apartment_info
-        WHERE locationcode = #{locationcode}
+    <!--증복된 값 제거-->
+    <select id="selApartmentInfoList" resultType="ApartmentInfoVo">
+        SELECT A.iapart, A.dong, A.jibun, A.apartmentname, A.dealamount
+               , A.buildyear, A.dealyear, A.dealmonth, A.dealday, A.areaforexclusiveuse
+               , A.`floor`
+               , B.nm AS locationname
+        FROM apartment_info A
+        LEFT JOIN location_code B
+        ON A.locationcode = B.`code`
+        WHERE A.excd = #{excd}
+          AND A.dealyear = #{year}
+          AND A.dealmonth = #{month}
+        ORDER BY A.dealamount DESC;
+    </select>
+
+    <select id="selLocation" resultType="LocationCodeEntity">
+        SELECT code FROM location_code
+        WHERE excd = #{excd}
     </select>
 </mapper>

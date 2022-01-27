@@ -21,5 +21,14 @@ public class ApartmentInfoEntity {
     @JsonProperty("지번") private String jibun;
     @JsonProperty("층") private int floor;
     private int locationcode;
-    private String excd;
+    @JsonProperty("도로명시군구코드") private String excd;
+
+    //두번째 방법
+    public void setDealamount(String dealamount) {
+        this.dealamount = dealamount.replaceAll(",", "").trim();//trim 양쪽 빈칸 없앰
+    }
+    //세번째 방법은 쿼리문에 REPLACE(TRIM) 사용 SELECT
+    //            REPLACE(TRIM(#{dealamount}), ',', '') , #{buildyear}, #{dealyear}, #{dealmonth}, #{dealday}
+    //             , #{dong}, #{apartmentname}, #{areaforexclusiveuse}, #{jibun}, #{floor}
+    //             , `code`, #{excd}
 }

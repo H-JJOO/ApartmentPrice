@@ -8,6 +8,8 @@
     <title>result</title>
 </head>
 <body>
+    <h1>아파트 거래 내역</h1>
+    <a href="/"><button>검색창으로 이동</button></a>
     <div>
         <table border="1">
             <tr>
@@ -22,8 +24,9 @@
                 <th>전용면적</th>
                 <th>층</th>
             </tr>
-            <c:forEach items="${requestScope.resultList}" var="item">
+            <c:forEach items="${requestScope.list}" var="item">
             <tr>
+                <td>${item.locationname}</td>
                 <td>${item.dong}</td>
                 <td>${item.jibun}</td>
                 <td>${item.apartmentname}</td>

@@ -19,13 +19,13 @@ public class ApController {
     }
 
     @PostMapping("/result")
-    public void result(SearchDto dto) {
-        service.getData(dto);
+    public void result(Model model, SearchDto dto) {
+        model.addAttribute("list", service.getData(dto));
     }
 
-    @GetMapping("/result")
-    public String result(Model model) {
-        model.addAttribute("ApartmentInfo", service.selApartmentInfoList());
-        return "result";
-    }
+//    @GetMapping("/result")
+//    public String result(Model model, SearchDto dto) {
+//        model.addAttribute("list", service.getData(dto));
+//        return "redirect:/result";
+//    }
 }
